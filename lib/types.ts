@@ -2,12 +2,10 @@ export interface MetaCredentials {
   accessToken: string
   adAccountId: string
 }
-
 export interface DateRange {
   since: string
   until: string
 }
-
 export interface Insights {
   spend: number
   impressions: number
@@ -19,7 +17,6 @@ export interface Insights {
   actions?: { action_type: string; value: string }[]
   cost_per_action_type?: { action_type: string; value: string }[]
 }
-
 export interface AgeGenderBreakdown {
   age: string
   gender: string
@@ -29,7 +26,14 @@ export interface AgeGenderBreakdown {
   ctr: number
   actions?: { action_type: string; value: string }[]
 }
-
+export interface DailyInsight {
+  date: string
+  spend: number
+  impressions: number
+  clicks: number
+  ctr: number
+  cv: number
+}
 export interface Campaign {
   id: string
   name: string
@@ -38,7 +42,6 @@ export interface Campaign {
   insights?: Insights
   ageGenderBreakdown?: AgeGenderBreakdown[]
 }
-
 export interface AdSet {
   id: string
   name: string
@@ -50,7 +53,6 @@ export interface AdSet {
   insights?: Insights
   ageGenderBreakdown?: AgeGenderBreakdown[]
 }
-
 export interface Creative {
   id: string
   name: string
@@ -61,7 +63,6 @@ export interface Creative {
   image_url?: string
   type: 'VIDEO' | 'IMAGE' | 'CAROUSEL'
 }
-
 export interface Ad {
   id: string
   name: string
@@ -72,17 +73,16 @@ export interface Ad {
   insights?: Insights
   ageGenderBreakdown?: AgeGenderBreakdown[]
 }
-
 export interface DashboardData {
   campaigns: Campaign[]
   adsets: AdSet[]
   ads: Ad[]
   totals: Insights
+  dailyInsights: DailyInsight[]
   dateRange: DateRange
   fetchedAt: string
 }
-
-export type Period = 'today' | 'this_week' | 'this_month' | 'last_month'
+export type Period = 'today' | 'this_week' | 'this_month' | 'last_month' | 'custom'
 export type TabId = 'overview' | 'campaign' | 'adset' | 'creative' | 'compare'
 export type CompareMode = 'adset' | 'creative'
 export type DemoMetric = 'ctr' | 'cv' | 'cpa' | 'imp'
