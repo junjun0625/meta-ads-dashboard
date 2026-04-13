@@ -43,6 +43,8 @@ export default function Dashboard() {
   const [goals, setGoals] = useState<Record<string, Goal>>({})
   const [accessToken, setAccessToken] = useState('')
   const [adAccountId, setAdAccountId] = useState('')
+  const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [cmpMode, setCmpMode] = useState<CompareMode>('adset')
   const [demoMetric, setDemoMetric] = useState<DemoMetric>('ctr')
@@ -50,6 +52,27 @@ export default function Dashboard() {
   const [selCreative, setSelCreative] = useState<string | null>(null)
   const [crTypeFilter, setCrTypeFilter] = useState('all')
   const [activeOnly, setActiveOnly] = useState(false)
+
+  const refreshToken = async () => {
+    if (!accessToken) return
+    setRefreshing(true)
+    try {
+      const res = await fetch('/api/refresh-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken }),
+      })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setAccessToken(json.accessToken)
+      setTokenExpiresAt(json.expiresAt)
+      alert('トークンを延長しました。新しいトークンをコピーして保存してください。\n\n' + json.accessToken)
+    } catch (e: unknown) {
+      alert('延長失敗: ' + (e instanceof Error ? e.message : String(e)))
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -217,6 +240,13 @@ export default function Dashboard() {
                 接続して更新
               </button>
               <span className="text-[11px] text-gray-400">※ トークンはブラウザのメモリにのみ保持されます</span>
+            </div>
+            <div className="flex items-center gap-3 mt-2">
+              <button onClick={refreshToken} disabled={!accessToken || refreshing}
+                className="text-xs px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 disabled:opacity-40">
+                {refreshing ? '延長中...' : '↻ トークンを60日延長'}
+              </button>
+              {tokenExpiresAt && <span className="text-[11px] text-gray-400">有効期限: {tokenExpiresAt}</span>}
             </div>
             {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
           </div>
