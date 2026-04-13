@@ -59,7 +59,7 @@ export async function fetchDashboard(
 
   // Campaigns
   const campRaw = await apiFetch(`/${actId}/campaigns`, {
-    fields: `id,name,status,objective,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
+    fields: `id,name,status,effective_status,objective,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
     limit: '50',
   }, token)
 
@@ -85,7 +85,7 @@ export async function fetchDashboard(
 
   // Ad Sets
   const adsetRaw = await apiFetch(`/${actId}/adsets`, {
-    fields: `id,name,campaign_id,campaign{name},status,daily_budget,lifetime_budget,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
+    fields: `id,name,campaign_id,campaign{name},status,effective_status,daily_budget,lifetime_budget,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
     limit: '100',
   }, token)
 
@@ -104,7 +104,7 @@ export async function fetchDashboard(
         name: a.name as string,
         campaign_id: a.campaign_id as string,
         campaign_name: camp?.name || '',
-        status: a.status as string,
+        status: (a.effective_status || a.status) as string,
         daily_budget: a.daily_budget ? parseInt(a.daily_budget as string) : undefined,
         lifetime_budget: a.lifetime_budget ? parseInt(a.lifetime_budget as string) : undefined,
         insights: ins ? parseInsights(ins as Record<string, string>) : undefined,
@@ -134,7 +134,7 @@ export async function fetchDashboard(
         name: a.name as string,
         adset_id: a.adset_id as string,
         campaign_id: a.campaign_id as string,
-        status: a.status as string,
+        status: (a.effective_status || a.status) as string,
         creative: cr ? {
           id: cr.id,
           name: cr.name || '',
