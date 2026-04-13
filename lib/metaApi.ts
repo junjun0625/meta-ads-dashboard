@@ -161,7 +161,7 @@ export async function fetchDashboard(
     spend: 0, impressions: 0, clicks: 0, ctr: 0, cpc: 0, cpm: 0, reach: 0
   }
 
-  return { campaigns, adsets, ads, totals, dateRange, fetchedAt: new Date().toISOString() }
+  return { campaigns, adsets, ads, totals, dailyInsights, dateRange, fetchedAt: new Date().toISOString() }
 }
 
 export function getCvCount(ins?: Insights): number {
