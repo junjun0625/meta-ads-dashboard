@@ -161,7 +161,7 @@ export async function fetchDashboard(
   }, token)
 
   const dailyInsights = (dailyRaw.data || []).map((d: Record<string, unknown>) => {
-    const ins = parseInsights(d)
+    const ins = parseInsights(d as Record<string, string>)
     const cv = ins.actions?.find((a: {action_type: string; value: string}) =>
       ['offsite_conversion.fb_pixel_purchase','omni_purchase','lead','complete_registration'].includes(a.action_type)
     )
