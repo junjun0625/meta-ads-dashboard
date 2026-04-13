@@ -151,6 +151,30 @@ export async function fetchDashboard(
     })
   )
 
+  // Daily insights
+  const dailyRaw = await apiFetch(`/${actId}/insights`, {
+    fields: `spend,impressions,clicks,ctr,actions`,
+    time_range: drParam,
+    time_increment: '1',
+    level: 'account',
+    limit: '90',
+  }, token)
+
+  const dailyInsights = (dailyRaw.data || []).map((d: Record<string, unknown>) => {
+    const ins = parseInsights(d)
+    const cv = ins.actions?.find((a: {action_type: string; value: string}) =>
+      ['offsite_conversion.fb_pixel_purchase','omni_purchase','lead','complete_registration'].includes(a.action_type)
+    )
+    return {
+      date: d.date_start as string,
+      spend: ins.spend,
+      impressions: ins.impressions,
+      clicks: ins.clicks,
+      ctr: ins.ctr,
+      cv: cv ? parseInt(cv.value) : 0,
+    }
+  })
+
   // Totals
   const totRaw = await apiFetch(`/${actId}/insights`, {
     fields: INSIGHT_FIELDS,
