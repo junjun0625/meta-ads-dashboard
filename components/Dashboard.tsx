@@ -41,14 +41,8 @@ export default function Dashboard() {
   const [showCustom, setShowCustom] = useState(false)
   const [tab, setTab] = useState<TabId>('overview')
   const [goals, setGoals] = useState<Record<string, Goal>>({})
-  const [accessToken, setAccessToken] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return localStorage.getItem('meta_access_token') || ''
-  })
-  const [adAccountId, setAdAccountId] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return localStorage.getItem('meta_ad_account_id') || ''
-  })
+  const [accessToken, setAccessToken] = useState('')
+  const [adAccountId, setAdAccountId] = useState('')
   const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -104,7 +98,15 @@ export default function Dashboard() {
     if (period !== 'custom') fetchData()
   }, [period]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { fetchData() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchData() }, []) // eslint-disable-line
+
+  // Load saved credentials from localStorage on mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem('meta_access_token')
+    const savedAccountId = localStorage.getItem('meta_ad_account_id')
+    if (savedToken) setAccessToken(savedToken)
+    if (savedAccountId) setAdAccountId(savedAccountId)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleGoal = (key: string, goal: Goal | null) => {
     setGoals(prev => { const n = { ...prev }; if (goal) n[key] = goal; else delete n[key]; return n })
