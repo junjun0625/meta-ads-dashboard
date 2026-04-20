@@ -41,8 +41,14 @@ export default function Dashboard() {
   const [showCustom, setShowCustom] = useState(false)
   const [tab, setTab] = useState<TabId>('overview')
   const [goals, setGoals] = useState<Record<string, Goal>>({})
-  const [accessToken, setAccessToken] = useState('')
-  const [adAccountId, setAdAccountId] = useState('')
+  const [accessToken, setAccessToken] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return localStorage.getItem('meta_access_token') || ''
+  })
+  const [adAccountId, setAdAccountId] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return localStorage.getItem('meta_ad_account_id') || ''
+  })
   const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -239,7 +245,9 @@ export default function Dashboard() {
                 className="text-xs px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:opacity-80">
                 接続して更新
               </button>
-              <span className="text-[11px] text-gray-400">※ トークンはブラウザのメモリにのみ保持されます</span>
+              <span className="text-[11px] text-gray-400">※ 入力情報はこのブラウザに保存されます</span>
+              <button onClick={() => { localStorage.removeItem('meta_access_token'); localStorage.removeItem('meta_ad_account_id'); setAccessToken(''); setAdAccountId('') }}
+                className="text-xs text-red-400 hover:text-red-600">クリア</button>
             </div>
             <div className="flex items-center gap-3 mt-2">
               <button onClick={refreshToken} disabled={!accessToken || refreshing}
