@@ -100,12 +100,14 @@ export default function Dashboard() {
   const [drillCampaign,setDrillCampaign] = useState<string|null>(null)
   const [drillAdset,setDrillAdset]       = useState<string|null>(null)
 
+  const [credLoaded, setCredLoaded] = useState(false)
   useEffect(()=>{
     const t=localStorage.getItem('meta_access_token')
     const a=localStorage.getItem('meta_ad_account_id')
     if(t) setAccessToken(t)
     if(a) setAdAccountId(a)
-  },[])
+    setCredLoaded(true)
+  },[]) // eslint-disable-line
 
   const refreshToken = async () => {
     if (!accessToken) return
@@ -135,7 +137,7 @@ export default function Dashboard() {
     finally{ setLoading(false) }
   },[accessToken,adAccountId,period,customRange,shortcut])
 
-  useEffect(()=>{ fetchData() },[]) // eslint-disable-line
+  useEffect(()=>{ if(credLoaded) fetchData() },[credLoaded]) // eslint-disable-line
 
   const switchTab = (t: TabId) => {
     tabScrollRef.current[tab]=window.scrollY
