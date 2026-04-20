@@ -33,6 +33,10 @@ function barColor(v: number, max: number, metric: DemoMetric) {
 }
 
 export function AgeGenderView({ breakdown, metric }: AgeGenderProps) {
+  if (!breakdown || breakdown.length === 0) return (
+    <div className="text-xs text-gray-300 text-center py-4">データなし</div>
+  )
+
   const maleRows = AGES.map(age => ({
     age,
     ...breakdown.find(r => r.age === age && r.gender === 'male'),

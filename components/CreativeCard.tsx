@@ -77,7 +77,7 @@ export function CreativeCard({ ad, rank, selected, onSelect, demoMetric }: Creat
           ))}
         </div>
       </div>
-      {selected && ad.ageGenderBreakdown && ad.ageGenderBreakdown.length > 0 && (
+      {selected && (ad.ageGenderBreakdown?.length ?? 0) > 0 && (
         <div className="border-t border-gray-100 dark:border-gray-700 p-3">
           <AgeGenderView breakdown={ad.ageGenderBreakdown} metric={demoMetric} />
         </div>
