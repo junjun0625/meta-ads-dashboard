@@ -37,6 +37,10 @@ export function AgeGenderView({ breakdown, metric }: AgeGenderProps) {
     <div className="text-xs text-gray-300 text-center py-4">データなし</div>
   )
 
+  if (!breakdown || breakdown.length === 0) return (
+    <div className="text-xs text-gray-300 text-center py-4">データなし</div>
+  )
+
   const maleRows = AGES.map(age => ({
     age,
     ...breakdown.find(r => r.age === age && r.gender === 'male'),
