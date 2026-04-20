@@ -9,9 +9,10 @@ interface AgeGenderProps {
 
 const AGES = ['13-17', '18-24', '25-34', '35-44', '45+']
 
-function getVal(row: AgeGenderBreakdown, metric: DemoMetric): number {
-  if (metric === 'ctr') return row.ctr
-  if (metric === 'imp') return row.impressions
+function getVal(row: AgeGenderBreakdown | undefined, metric: DemoMetric): number {
+  if (!row) return 0
+  if (metric === 'ctr') return row.ctr ?? 0
+  if (metric === 'imp') return row.impressions ?? 0
   if (metric === 'cv') {
     const cv = row.actions?.find(a => ['lead', 'offsite_conversion.fb_pixel_purchase', 'omni_purchase', 'complete_registration'].includes(a.action_type))
     return cv ? parseInt(cv.value) : 0
@@ -19,7 +20,8 @@ function getVal(row: AgeGenderBreakdown, metric: DemoMetric): number {
   return 0
 }
 
-function fmtVal(v: number, metric: DemoMetric) {
+function fmtVal(v: number | undefined, metric: DemoMetric) {
+  if (v === undefined || isNaN(v)) return '0'
   if (metric === 'ctr') return v.toFixed(1) + '%'
   if (metric === 'imp') return v >= 1000 ? (v / 1000).toFixed(1) + 'K' : String(Math.round(v))
   return String(Math.round(v))
@@ -53,11 +55,15 @@ export function AgeGenderView({ breakdown, metric }: AgeGenderProps) {
   const allVals = [...maleRows, ...femaleRows].map(r => getVal(r as AgeGenderBreakdown, metric))
   const maxV = Math.max(...allVals, 0.01)
 
-  const chartData = AGES.map((age, i) => ({
-    age,
-    男性: parseFloat(getVal(maleRows[i] as AgeGenderBreakdown, metric).toFixed(2)),
-    女性: parseFloat(getVal(femaleRows[i] as AgeGenderBreakdown, metric).toFixed(2)),
-  }))
+  const chartData = AGES.map((age, i) => {
+    const mv = getVal(maleRows[i] as AgeGenderBreakdown, metric)
+    const fv = getVal(femaleRows[i] as AgeGenderBreakdown, metric)
+    return {
+      age,
+      男性: isNaN(mv) ? 0 : parseFloat(mv.toFixed(2)),
+      女性: isNaN(fv) ? 0 : parseFloat(fv.toFixed(2)),
+    }
+  })
 
   return (
     <div>
