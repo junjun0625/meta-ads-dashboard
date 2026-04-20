@@ -49,7 +49,7 @@ export default function Dashboard() {
   const [cmpMode, setCmpMode] = useState<CompareMode>('adset')
   const [demoMetric, setDemoMetric] = useState<DemoMetric>('ctr')
   const [crSort, setCrSort] = useState<'ctr' | 'cv' | 'cpa' | 'imp'>('ctr')
-  const [selCreative, setSelCreative] = useState<string | null>(null)
+  const [selCreatives, setSelCreatives] = useState<Set<string>>(new Set())
   const [crTypeFilter, setCrTypeFilter] = useState('all')
   const [activeOnly, setActiveOnly] = useState(false)
 
@@ -408,8 +408,8 @@ export default function Dashboard() {
             <p className="text-xs text-gray-400 mb-3">カードをクリックすると年齢・性別の内訳が展開します</p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {allAds.map((ad, i) => (
-                <CreativeCard key={ad.id} ad={ad} rank={i} selected={selCreative===ad.id}
-                  onSelect={() => setSelCreative(selCreative===ad.id ? null : ad.id)} demoMetric={demoMetric} />
+                <CreativeCard key={ad.id} ad={ad} rank={i} selected={selCreatives.has(ad.id)}
+                  onSelect={() => setSelCreatives(prev => { const n = new Set(prev); n.has(ad.id) ? n.delete(ad.id) : n.add(ad.id); return n })} demoMetric={demoMetric} />
               ))}
             </div>
           </div>
