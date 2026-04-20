@@ -103,7 +103,7 @@ export async function fetchDashboard(
 
   // Campaigns
   const campRaw = await apiFetch(`/${actId}/campaigns`, {
-    fields: `id,name,status,objective,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
+    fields: `id,name,status,effective_status,objective,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
     limit: '50',
   }, token)
 
@@ -119,7 +119,7 @@ export async function fetchDashboard(
       return {
         id: c.id as string,
         name: c.name as string,
-        status: c.status as string,
+        status: ((c.effective_status || c.status) as string).toUpperCase(),
         objective: c.objective as string,
         insights: ins ? parseInsights(ins) : undefined,
         ageGenderBreakdown: parseAgeGender(agRaw.data || []),
@@ -129,7 +129,7 @@ export async function fetchDashboard(
 
   // Ad Sets
   const adsetRaw = await apiFetch(`/${actId}/adsets`, {
-    fields: `id,name,campaign_id,campaign{name},status,daily_budget,lifetime_budget,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
+    fields: `id,name,campaign_id,campaign{name},status,effective_status,daily_budget,lifetime_budget,insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
     limit: '100',
   }, token)
 
@@ -148,7 +148,7 @@ export async function fetchDashboard(
         name: a.name as string,
         campaign_id: a.campaign_id as string,
         campaign_name: camp?.name || '',
-        status: a.status as string,
+        status: ((a.effective_status || a.status) as string).toUpperCase(),
         daily_budget: a.daily_budget ? parseInt(a.daily_budget as string) : undefined,
         lifetime_budget: a.lifetime_budget ? parseInt(a.lifetime_budget as string) : undefined,
         insights: ins ? parseInsights(ins) : undefined,
@@ -159,7 +159,7 @@ export async function fetchDashboard(
 
   // Ads
   const adsRaw = await apiFetch(`/${actId}/ads`, {
-    fields: `id,name,adset_id,campaign_id,status,creative{id,name,title,body,thumbnail_url,video_id,image_url},insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
+    fields: `id,name,adset_id,campaign_id,status,effective_status,creative{id,name,title,body,thumbnail_url,video_id,image_url},insights.time_range(${drParam}){${INSIGHT_FIELDS}}`,
     limit: '100',
   }, token)
 
@@ -178,7 +178,7 @@ export async function fetchDashboard(
         name: a.name as string,
         adset_id: a.adset_id as string,
         campaign_id: a.campaign_id as string,
-        status: a.status as string,
+        status: ((a.effective_status || a.status) as string).toUpperCase(),
         creative: cr ? {
           id: cr.id,
           name: cr.name || '',
