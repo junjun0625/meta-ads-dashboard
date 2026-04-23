@@ -153,9 +153,40 @@ export default function Dashboard() {
     setPreset('カスタム')
   }
 
+  // トークン切れ等のエラー時はAPI設定パネルを表示
   if (!data) return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500 text-sm">
-      {loading?'データを取得中...':error||''}
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white flex items-center justify-center p-6">
+      <div className="w-full max-w-xl">
+        {loading ? (
+          <div className="text-center text-gray-400 text-sm">データを取得中...</div>
+        ) : (
+          <div>
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600">{error}</div>
+            )}
+            <div className="p-5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <div className="text-sm font-medium mb-4">Meta Marketing API 接続設定</div>
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">アクセストークン</label>
+                  <input type="password" value={accessToken} onChange={e=>setAccessToken(e.target.value)} placeholder="EAAxxxxxxxx..."
+                    className="w-full text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 font-mono"/>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">広告アカウントID</label>
+                  <input type="text" value={adAccountId} onChange={e=>setAdAccountId(e.target.value)} placeholder="123456789"
+                    className="w-full text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 font-mono"/>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <button onClick={()=>{localStorage.setItem('meta_access_token',accessToken);localStorage.setItem('meta_ad_account_id',adAccountId);fetchData()}}
+                  className="text-xs px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium">接続して更新</button>
+                <span className="text-[11px] text-gray-400">※ 接続時に自動保存されます</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 
