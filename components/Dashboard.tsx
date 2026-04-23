@@ -315,20 +315,21 @@ export default function Dashboard() {
             <button key={p.key} onClick={()=>{
               setShortcut(p.key)
               if(p.key==='custom'){setShowCustom(true);return}
+              // Compute range immediately and pass directly - don't rely on state
               const r=shortcutToRange(p.key)
-              if(r){setCustomRange(r);setPeriod('custom');fetchData(r)}
-              else{
-                // For non-shortcut periods, compute range from period key
-                const pr: Record<string,{since:string;until:string}> = {
-                  'today': {since:todayStr(),until:todayStr()},
-                  'this_week': (()=>{const d=new Date();const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));return {since:fmtD(mon),until:todayStr()}})(),
-                  'this_month': (()=>{const d=new Date();return {since:fmtD(new Date(d.getFullYear(),d.getMonth(),1)),until:todayStr()}})(),
-                  'last_month': (()=>{const d=new Date();const f=new Date(d.getFullYear(),d.getMonth()-1,1);const l=new Date(d.getFullYear(),d.getMonth(),0);return {since:fmtD(f),until:fmtD(l)}})(),
+              if(r){
+                setCustomRange(r); setPeriod('custom'); fetchData(r)
+              } else {
+                const d=new Date()
+                const periodRanges: Record<string,DateRange> = {
+                  'today':      {since:todayStr(), until:todayStr()},
+                  'this_week':  (()=>{const day=d.getDay(); const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1)); return {since:fmtD(mon),until:todayStr()}})(),
+                  'this_month': {since:fmtD(new Date(d.getFullYear(),d.getMonth(),1)), until:todayStr()},
+                  'last_month': (()=>{const f=new Date(d.getFullYear(),d.getMonth()-1,1); const l=new Date(d.getFullYear(),d.getMonth(),0); return {since:fmtD(f),until:fmtD(l)}})(),
                 }
-                const range=pr[p.key as string]
+                const range=periodRanges[p.key as string]
                 setPeriod(p.key as Period)
-                if(range) fetchData(range)
-                else fetchData()
+                fetchData(range || undefined)
               }
             }} className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${shortcut===p.key?'bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900':'border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
               {p.key==='custom'&&shortcut==='custom'?periodLabel:p.label}
